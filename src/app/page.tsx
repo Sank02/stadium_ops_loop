@@ -398,7 +398,7 @@ export default function StadiumOpsDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800">
-                {[...history].reverse().slice(0, 10).map((entry, idx) => (
+                {[...history].filter(entry => entry && entry.tick_id).reverse().slice(0, 10).map((entry, idx) => (
                   <tr key={idx} className="hover:bg-gray-800/30 transition-colors">
                     <td className="px-4 py-3 font-mono text-gray-400 whitespace-nowrap text-center align-middle">#{entry.tick_id}</td>
                     <td className="px-4 py-3 text-gray-300 whitespace-nowrap text-center align-middle">{new Date(entry.timestamp).toLocaleTimeString()}</td>

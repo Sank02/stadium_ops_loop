@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { Redis } from '@upstash/redis';
 import { Signals } from '@/lib/sense';
+
+let redis: Redis;
+function getRedis() {
+  if (!redis) {
+    redis = Redis.fromEnv();
+  }
+  return redis;
+}
 
 export async function POST() {
   try {
-    const dataDir = path.join(process.cwd(), 'data');
-    
     // Baseline signals
     const baselineSignals: Signals = {
       timestamp: new Date().toISOString(),
@@ -27,15 +32,8 @@ export async function POST() {
       incidents: []
     };
 
-    await fs.promises.writeFile(
-      path.join(dataDir, 'signals.json'), 
-      JSON.stringify(baselineSignals, null, 2)
-    );
-
-    await fs.promises.writeFile(
-      path.join(dataDir, 'log.json'), 
-      JSON.stringify([], null, 2)
-    );
+    await getRedis().set('signals', JSON.stringify(baselineSignals));
+    await getRedis().set('log', JSON.stringify([]));
 
     return NextResponse.json({ success: true, signals: baselineSignals, history: [] });
   } catch (error: any) {

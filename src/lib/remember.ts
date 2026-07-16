@@ -1,9 +1,14 @@
-import fs from 'fs';
-import path from 'path';
+import { Redis } from '@upstash/redis';
 import { VerifyResult } from './verify';
 import { Signals } from './sense';
 
-const LOG_PATH = path.join(process.cwd(), 'data', 'log.json');
+let redis: Redis;
+function getRedis() {
+  if (!redis) {
+    redis = Redis.fromEnv();
+  }
+  return redis;
+}
 
 export interface LogEntry {
   tick_id: number;
@@ -16,10 +21,20 @@ export interface LogEntry {
 
 export async function readLog(): Promise<LogEntry[]> {
   try {
-    const data = await fs.promises.readFile(LOG_PATH, 'utf-8');
-    return JSON.parse(data) as LogEntry[];
+    const data = await getRedis().get<any>('log');
+    if (!data) return [];
+    
+    let parsedData = data;
+    if (typeof data === 'string') {
+      try {
+        parsedData = JSON.parse(data);
+      } catch (e) {
+        return [];
+      }
+    }
+    
+    return Array.isArray(parsedData) ? parsedData.filter(Boolean) : [];
   } catch (err) {
-    // Return empty array if file doesn't exist or is empty
     return [];
   }
 }
@@ -27,7 +42,7 @@ export async function readLog(): Promise<LogEntry[]> {
 export async function writeLog(entries: LogEntry[]): Promise<void> {
   // Keep only the most recent 100 entries to prevent infinite growth
   const trimmed = entries.slice(-100);
-  await fs.promises.writeFile(LOG_PATH, JSON.stringify(trimmed, null, 2), 'utf-8');
+  await getRedis().set('log', JSON.stringify(trimmed));
 }
 
 export async function appendToLog(

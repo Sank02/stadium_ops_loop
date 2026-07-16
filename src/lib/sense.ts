@@ -1,7 +1,12 @@
-import fs from 'fs';
-import path from 'path';
+import { Redis } from '@upstash/redis';
 
-const SIGNALS_PATH = path.join(process.cwd(), 'data', 'signals.json');
+let redis: Redis;
+function getRedis() {
+  if (!redis) {
+    redis = Redis.fromEnv();
+  }
+  return redis;
+}
 
 export interface GateSignal {
   gate_id: string;
@@ -32,12 +37,12 @@ export interface Signals {
 }
 
 export async function readSignals(): Promise<Signals> {
-  const data = await fs.promises.readFile(SIGNALS_PATH, 'utf-8');
-  return JSON.parse(data) as Signals;
+  const data = await getRedis().get<Signals>('signals');
+  return data as Signals;
 }
 
 export async function writeSignals(signals: Signals): Promise<void> {
-  await fs.promises.writeFile(SIGNALS_PATH, JSON.stringify(signals, null, 2), 'utf-8');
+  await getRedis().set('signals', signals);
 }
 
 export function perturbSignals(signals: Signals, forceEvent: boolean = false, testInvalidLocation: boolean = false): Signals {

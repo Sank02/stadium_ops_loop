@@ -20,8 +20,7 @@ export async function POST(request: Request) {
         type: "medical_emergency",
         location: "Gate Z",
         reported_by: "test_harness",
-        description: "Test incident with invalid location",
-        severity: "high"
+        description: "Test incident with invalid location"
       });
     }
     

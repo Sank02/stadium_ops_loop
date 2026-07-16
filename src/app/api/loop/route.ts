@@ -15,13 +15,16 @@ export async function POST(request: Request) {
     const updatedSignals = perturbSignals(currentSignals, forceEvent);
     
     if (testInvalidLocation) {
-      updatedSignals.incidents.push({
-        id: `inc_test_${Date.now()}`,
+      const testIncident = {
+        id: "inc_test_invalid_location",
         type: "medical_emergency",
         location: "Gate Z",
         reported_by: "test_harness",
         description: "Test incident with invalid location"
-      });
+      };
+      // Remove it if it exists so we can move it to the top
+      updatedSignals.incidents = updatedSignals.incidents.filter(i => i.id !== testIncident.id);
+      updatedSignals.incidents.unshift(testIncident);
     }
     
     await writeSignals(updatedSignals);

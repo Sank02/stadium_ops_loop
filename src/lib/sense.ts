@@ -80,7 +80,7 @@ export function perturbSignals(signals: Signals, forceEvent: boolean = false, te
 
   // Inject event
   if (testInvalidLocation) {
-    newSignals.incidents.push({
+    newSignals.incidents.unshift({
       id: `inc_test_${Math.floor(Math.random() * 1000)}`,
       type: "crowd_surge",
       location: "Gate Z",
@@ -96,7 +96,7 @@ export function perturbSignals(signals: Signals, forceEvent: boolean = false, te
     targetGate.queue_length += 200;
     targetGate.wait_minutes = Math.ceil(targetGate.queue_length / (targetGate.capacity / 60));
     
-    newSignals.incidents.push({
+    newSignals.incidents.unshift({
       id: `inc_${Math.floor(Math.random() * 1000)}`,
       type: "crowd_surge",
       location: `${targetGate.gate_id} concourse`,

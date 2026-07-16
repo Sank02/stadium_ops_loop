@@ -1,0 +1,12 @@
+{
+  "gates": [
+    { "id": "Gate A", "name": "North Gate", "capacity_per_hour": 5000 },
+    { "id": "Gate B", "name": "East Gate", "capacity_per_hour": 5000 },
+    { "id": "Gate C", "name": "South Gate", "capacity_per_hour": 8000 },
+    { "id": "Gate D", "name": "West Gate", "capacity_per_hour": 5000 }
+  ],
+  "concessions": [
+    { "id": "Concession F1", "name": "Burger Stand F1", "location": "Section 101" },
+    { "id": "Concession F12", "name": "Drinks F12", "location": "Section 215" }
+  ]
+}

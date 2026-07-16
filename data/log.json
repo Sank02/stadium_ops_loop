@@ -1,0 +1,285 @@
+[
+  {
+    "tick_id": 1,
+    "timestamp": "2026-07-15T15:20:01.516Z",
+    "signal_snapshot": {
+      "timestamp": "2026-07-15T15:20:00.469Z",
+      "gates": [
+        {
+          "gate_id": "Gate A",
+          "queue_length": 45,
+          "wait_minutes": 7,
+          "capacity": 400
+        },
+        {
+          "gate_id": "Gate B",
+          "queue_length": 65,
+          "wait_minutes": 10,
+          "capacity": 400
+        },
+        {
+          "gate_id": "Gate C",
+          "queue_length": 29,
+          "wait_minutes": 5,
+          "capacity": 400
+        },
+        {
+          "gate_id": "Gate D",
+          "queue_length": 49,
+          "wait_minutes": 8,
+          "capacity": 400
+        }
+      ],
+      "concessions": [
+        {
+          "stand_id": "Concession F1",
+          "wait_minutes": 2
+        },
+        {
+          "stand_id": "Concession F12",
+          "wait_minutes": 4
+        }
+      ],
+      "weather": {
+        "condition": "clear",
+        "temp_c": 24
+      },
+      "incidents": []
+    },
+    "reasoning_output": {
+      "recommendation": "no action needed",
+      "target_location": null,
+      "confidence": 0.95,
+      "reasoning": "All gate wait times are under 10 minutes and concession wait times are minimal. The stadium is operating within normal parameters with no significant congestion or incidents reported.",
+      "category": "none",
+      "alert_draft": null,
+      "requires_human_review": false
+    },
+    "verify_result": {
+      "passed": true
+    },
+    "action_taken": "shown_to_staff"
+  },
+  {
+    "tick_id": 2,
+    "timestamp": "2026-07-15T15:20:21.942Z",
+    "signal_snapshot": {
+      "timestamp": "2026-07-15T15:20:20.465Z",
+      "gates": [
+        {
+          "gate_id": "Gate A",
+          "queue_length": 245,
+          "wait_minutes": 37,
+          "capacity": 400
+        },
+        {
+          "gate_id": "Gate B",
+          "queue_length": 65,
+          "wait_minutes": 10,
+          "capacity": 400
+        },
+        {
+          "gate_id": "Gate C",
+          "queue_length": 28,
+          "wait_minutes": 5,
+          "capacity": 400
+        },
+        {
+          "gate_id": "Gate D",
+          "queue_length": 50,
+          "wait_minutes": 8,
+          "capacity": 400
+        }
+      ],
+      "concessions": [
+        {
+          "stand_id": "Concession F1",
+          "wait_minutes": 1
+        },
+        {
+          "stand_id": "Concession F12",
+          "wait_minutes": 3
+        }
+      ],
+      "weather": {
+        "condition": "clear",
+        "temp_c": 24
+      },
+      "incidents": [
+        {
+          "id": "inc_791",
+          "type": "crowd_surge",
+          "location": "Gate A concourse",
+          "reported_by": "system_monitor",
+          "description": "Sudden crowd surge detected at Gate A. Queue increased dramatically."
+        }
+      ]
+    },
+    "reasoning_output": {
+      "recommendation": "Redirect incoming fans to Gate B and Gate D to alleviate pressure at Gate A.",
+      "target_location": "Gate A",
+      "confidence": 0.9,
+      "reasoning": "A sudden crowd surge and significant increase in wait times (from 7 to 37 minutes) at Gate A have been detected. Immediate redirection is required to ensure safety and manage the crowd flow.",
+      "category": "crowd_management",
+      "alert_draft": {
+        "en": "Gate A is currently congested. Please proceed to Gate B or Gate D for faster entry.",
+        "hi": "गेट A पर भीड़ है। कृपया जल्दी प्रवेश के लिए गेट B या गेट D पर जाएं।",
+        "mr": "गेट A वर गर्दी आहे. कृपया जलद प्रवेशासाठी गेट B किंवा गेट D कडे जा."
+      },
+      "requires_human_review": true
+    },
+    "verify_result": {
+      "passed": false,
+      "reason": "Flagged by Reason stage (requires_human_review=true)"
+    },
+    "action_taken": "flagged_for_review"
+  },
+  {
+    "tick_id": 3,
+    "timestamp": "2026-07-15T15:20:42.064Z",
+    "signal_snapshot": {
+      "timestamp": "2026-07-15T15:20:40.461Z",
+      "gates": [
+        {
+          "gate_id": "Gate A",
+          "queue_length": 256,
+          "wait_minutes": 39,
+          "capacity": 400
+        },
+        {
+          "gate_id": "Gate B",
+          "queue_length": 68,
+          "wait_minutes": 11,
+          "capacity": 400
+        },
+        {
+          "gate_id": "Gate C",
+          "queue_length": 27,
+          "wait_minutes": 5,
+          "capacity": 400
+        },
+        {
+          "gate_id": "Gate D",
+          "queue_length": 47,
+          "wait_minutes": 8,
+          "capacity": 400
+        }
+      ],
+      "concessions": [
+        {
+          "stand_id": "Concession F1",
+          "wait_minutes": 3
+        },
+        {
+          "stand_id": "Concession F12",
+          "wait_minutes": 5
+        }
+      ],
+      "weather": {
+        "condition": "clear",
+        "temp_c": 24
+      },
+      "incidents": [
+        {
+          "id": "inc_791",
+          "type": "crowd_surge",
+          "location": "Gate A concourse",
+          "reported_by": "system_monitor",
+          "description": "Sudden crowd surge detected at Gate A. Queue increased dramatically."
+        }
+      ]
+    },
+    "reasoning_output": {
+      "recommendation": "Maintain redirection of fans to Gate B and Gate D; deploy additional security personnel to Gate A concourse to manage the surge.",
+      "target_location": "Gate A",
+      "confidence": 0.95,
+      "reasoning": "The crowd surge at Gate A has worsened, with wait times increasing to 39 minutes. Previous redirection efforts are insufficient to manage the volume. Immediate physical intervention by staff is required to ensure safety and prevent further escalation of the surge.",
+      "category": "safety",
+      "alert_draft": {
+        "en": "Gate A is at capacity. Please use Gate B or Gate D. Follow staff instructions for your safety.",
+        "hi": "गेट A पूरी तरह भर चुका है। कृपया गेट B या गेट D का उपयोग करें। अपनी सुरक्षा के लिए कर्मचारियों के निर्देशों का पालन करें।",
+        "mr": "गेट A पूर्ण भरला आहे. कृपया गेट B किंवा गेट D वापरा. आपल्या सुरक्षिततेसाठी कर्मचाऱ्यांच्या सूचनांचे पालन करा."
+      },
+      "requires_human_review": true
+    },
+    "verify_result": {
+      "passed": false,
+      "reason": "Flagged by Reason stage (requires_human_review=true)"
+    },
+    "action_taken": "flagged_for_review"
+  },
+  {
+    "tick_id": 4,
+    "timestamp": "2026-07-15T15:21:02.015Z",
+    "signal_snapshot": {
+      "timestamp": "2026-07-15T15:21:00.456Z",
+      "gates": [
+        {
+          "gate_id": "Gate A",
+          "queue_length": 255,
+          "wait_minutes": 39,
+          "capacity": 400
+        },
+        {
+          "gate_id": "Gate B",
+          "queue_length": 74,
+          "wait_minutes": 12,
+          "capacity": 400
+        },
+        {
+          "gate_id": "Gate C",
+          "queue_length": 29,
+          "wait_minutes": 5,
+          "capacity": 400
+        },
+        {
+          "gate_id": "Gate D",
+          "queue_length": 49,
+          "wait_minutes": 8,
+          "capacity": 400
+        }
+      ],
+      "concessions": [
+        {
+          "stand_id": "Concession F1",
+          "wait_minutes": 3
+        },
+        {
+          "stand_id": "Concession F12",
+          "wait_minutes": 8
+        }
+      ],
+      "weather": {
+        "condition": "clear",
+        "temp_c": 24
+      },
+      "incidents": [
+        {
+          "id": "inc_791",
+          "type": "crowd_surge",
+          "location": "Gate A concourse",
+          "reported_by": "system_monitor",
+          "description": "Sudden crowd surge detected at Gate A. Queue increased dramatically."
+        }
+      ]
+    },
+    "reasoning_output": {
+      "recommendation": "Escalate Gate A crowd management: deploy additional security to manage the surge and continue active redirection to Gates B and D.",
+      "target_location": "Gate A",
+      "confidence": 0.95,
+      "reasoning": "The crowd surge at Gate A persists with wait times remaining high (39 minutes). Despite previous recommendations, the situation has not improved. Immediate physical intervention by security staff is required to ensure safety and prevent potential crush conditions, while maintaining the redirection of fans to underutilized gates.",
+      "category": "safety",
+      "alert_draft": {
+        "en": "Gate A is at capacity. Please use Gate B or Gate D. Follow staff instructions for your safety.",
+        "hi": "गेट A पूरी तरह भर चुका है। कृपया गेट B या गेट D का उपयोग करें। अपनी सुरक्षा के लिए कर्मचारियों के निर्देशों का पालन करें।",
+        "mr": "गेट A पूर्ण भरला आहे. कृपया गेट B किंवा गेट D वापरा. आपल्या सुरक्षिततेसाठी कर्मचाऱ्यांच्या सूचनांचे पालन करा."
+      },
+      "requires_human_review": true
+    },
+    "verify_result": {
+      "passed": false,
+      "reason": "Flagged by Reason stage (requires_human_review=true)"
+    },
+    "action_taken": "flagged_for_review"
+  }
+]

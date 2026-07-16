@@ -1,22 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0f1117; /* Deep rich dark background */
+  --foreground: #e2e8f0; /* Soft white foreground */
+  --card: #1e212b; /* Slightly lighter for cards/panels */
+  --card-foreground: #f8fafc;
+  --border: #334155;
+  
+  /* Semantic Status Colors */
+  --status-green: #10b981;
+  --status-green-dim: rgba(16, 185, 129, 0.2);
+  --status-amber: #f59e0b;
+  --status-amber-dim: rgba(245, 158, 11, 0.2);
+  --status-red: #ef4444;
+  --status-red-dim: rgba(239, 68, 68, 0.2);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  
+  --color-success: var(--status-green);
+  --color-success-dim: var(--status-green-dim);
+  --color-warning: var(--status-amber);
+  --color-warning-dim: var(--status-amber-dim);
+  --color-danger: var(--status-red);
+  --color-danger-dim: var(--status-red-dim);
+  
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

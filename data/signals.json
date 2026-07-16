@@ -1,0 +1,52 @@
+{
+  "timestamp": "2026-07-15T15:21:00.456Z",
+  "gates": [
+    {
+      "gate_id": "Gate A",
+      "queue_length": 255,
+      "wait_minutes": 39,
+      "capacity": 400
+    },
+    {
+      "gate_id": "Gate B",
+      "queue_length": 74,
+      "wait_minutes": 12,
+      "capacity": 400
+    },
+    {
+      "gate_id": "Gate C",
+      "queue_length": 29,
+      "wait_minutes": 5,
+      "capacity": 400
+    },
+    {
+      "gate_id": "Gate D",
+      "queue_length": 49,
+      "wait_minutes": 8,
+      "capacity": 400
+    }
+  ],
+  "concessions": [
+    {
+      "stand_id": "Concession F1",
+      "wait_minutes": 3
+    },
+    {
+      "stand_id": "Concession F12",
+      "wait_minutes": 8
+    }
+  ],
+  "weather": {
+    "condition": "clear",
+    "temp_c": 24
+  },
+  "incidents": [
+    {
+      "id": "inc_791",
+      "type": "crowd_surge",
+      "location": "Gate A concourse",
+      "reported_by": "system_monitor",
+      "description": "Sudden crowd surge detected at Gate A. Queue increased dramatically."
+    }
+  ]
+}

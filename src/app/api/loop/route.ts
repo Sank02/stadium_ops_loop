@@ -8,7 +8,30 @@ import path from 'path';
 
 export async function POST(request: Request) {
   try {
-    const { forceEvent, testInvalidLocation } = await request.json().catch(() => ({ forceEvent: false, testInvalidLocation: false }));
+    // --- Input validation ---
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+
+    if (body !== null && typeof body !== 'object') {
+      return NextResponse.json({ error: 'Request body must be a JSON object' }, { status: 400 });
+    }
+
+    const raw = body as Record<string, unknown>;
+
+    if ('forceEvent' in raw && typeof raw.forceEvent !== 'boolean') {
+      return NextResponse.json({ error: 'forceEvent must be a boolean' }, { status: 400 });
+    }
+    if ('testInvalidLocation' in raw && typeof raw.testInvalidLocation !== 'boolean') {
+      return NextResponse.json({ error: 'testInvalidLocation must be a boolean' }, { status: 400 });
+    }
+
+    const forceEvent = (raw.forceEvent as boolean | undefined) ?? false;
+    const testInvalidLocation = (raw.testInvalidLocation as boolean | undefined) ?? false;
+    // --- End input validation ---
 
     // 1. Sense
     const currentSignals = await readSignals();
@@ -54,9 +77,9 @@ export async function POST(request: Request) {
       verifyReason: verifyResult.reason,
       log: logEntry
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("API Loop Error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -69,7 +92,9 @@ export async function GET() {
       signals,
       history
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    console.error("API Loop GET Error:", error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

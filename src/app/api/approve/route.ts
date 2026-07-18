@@ -11,10 +11,28 @@ function getRedis() {
 
 export async function POST(request: Request) {
   try {
-    const { tick_id } = await request.json();
-    if (!tick_id) {
+    // --- Input validation ---
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+
+    if (body === null || typeof body !== 'object' || Array.isArray(body)) {
+      return NextResponse.json({ error: 'Request body must be a JSON object' }, { status: 400 });
+    }
+
+    const raw = body as Record<string, unknown>;
+    const tick_id = raw.tick_id;
+
+    if (tick_id === undefined || tick_id === null) {
       return NextResponse.json({ error: "Missing tick_id" }, { status: 400 });
     }
+    if (typeof tick_id !== 'string' && typeof tick_id !== 'number') {
+      return NextResponse.json({ error: "tick_id must be a string or number" }, { status: 400 });
+    }
+    // --- End input validation ---
 
     let logs: any[] = [];
     try {
@@ -38,7 +56,8 @@ export async function POST(request: Request) {
     await getRedis().set('log', JSON.stringify(updatedLogs));
     
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    console.error("API Approve Error:", err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

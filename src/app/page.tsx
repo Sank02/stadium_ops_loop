@@ -153,33 +153,38 @@ export default function StadiumOpsDashboard() {
         <div className="flex flex-wrap gap-3 items-center mt-4 md:mt-0 justify-start md:justify-end">
           <button 
             onClick={resetDemoData}
+            aria-label="Reset demo data"
             className="px-4 py-2.5 bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg font-medium transition-colors flex items-center gap-2 border border-gray-600 text-sm h-10"
           >
-            <RotateCcw size={18} />
+            <RotateCcw size={18} aria-hidden="true" />
             Reset Demo Data
           </button>
 
           <button 
             onClick={triggerInvalidLocationTest}
+            aria-label="Test: Invalid Location (injects an incident with an invalid location to test the Verify stage)"
             className="px-4 py-2.5 bg-purple-900/50 text-purple-400 hover:bg-purple-900 hover:text-white rounded-lg font-medium transition-colors flex items-center gap-2 border border-purple-500/50 text-sm h-10"
           >
-            <Bug size={18} />
+            <Bug size={18} aria-hidden="true" />
             Test: Invalid Location
           </button>
 
           <button 
             onClick={triggerEvent}
+            aria-label="Trigger a simulated crowd event"
             className="px-4 py-2.5 bg-[var(--color-warning-dim)] text-[var(--color-warning)] hover:bg-[var(--color-warning)] hover:text-white rounded-lg font-medium transition-colors flex items-center gap-2 border border-[var(--color-warning)] text-sm h-10"
           >
-            <AlertTriangle size={18} />
+            <AlertTriangle size={18} aria-hidden="true" />
             Trigger Event
           </button>
           
           <button 
             onClick={toggleLoop}
+            aria-label={isRunning ? 'Stop the autonomous loop' : 'Start the autonomous loop'}
+            aria-pressed={isRunning}
             className={`px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 text-sm border h-10 ${isRunning ? 'bg-[var(--color-danger-dim)] text-[var(--color-danger)] border-[var(--color-danger)] hover:bg-[var(--color-danger)] hover:text-white' : 'bg-[var(--color-success-dim)] text-[var(--color-success)] border-[var(--color-success)] hover:bg-[var(--color-success)] hover:text-white'}`}
           >
-            {isRunning ? <><Pause size={18} /> Stop Loop</> : <><Play size={18} /> Start Loop</>}
+            {isRunning ? <><Pause size={18} aria-hidden="true" /> Stop Loop</> : <><Play size={18} aria-hidden="true" /> Start Loop</>}
           </button>
         </div>
       </header>
@@ -262,7 +267,11 @@ export default function StadiumOpsDashboard() {
 
         {/* Middle Column: Current Recommendation */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-[var(--color-card)] p-6 rounded-2xl border border-[var(--color-border)] shadow-lg min-h-[550px] flex flex-col relative overflow-hidden">
+          <div
+            aria-live="polite"
+            aria-label="Action Hub recommendations"
+            className="bg-[var(--color-card)] p-6 rounded-2xl border border-[var(--color-border)] shadow-lg min-h-[550px] flex flex-col relative overflow-hidden"
+          >
             
             {/* Background Gradient based on status */}
             <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${
@@ -351,11 +360,13 @@ export default function StadiumOpsDashboard() {
                       <h4 className="text-sm font-medium flex items-center gap-2">
                         <span>📢 Fan Screen Alert</span>
                       </h4>
-                      <div className="flex gap-1 bg-black/20 p-1 rounded-lg">
+                      <div role="group" aria-label="Alert language" className="flex gap-1 bg-black/20 p-1 rounded-lg">
                         {(['en', 'hi', 'mr'] as const).map(l => (
                           <button
                             key={l}
                             onClick={() => setLang(l)}
+                            aria-label={`Show alert in ${l === 'en' ? 'English' : l === 'hi' ? 'Hindi' : 'Marathi'}`}
+                            aria-pressed={lang === l}
                             className={`px-3 py-1 text-xs rounded-md font-medium transition-colors ${lang === l ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}
                           >
                             {l.toUpperCase()}
@@ -416,6 +427,7 @@ export default function StadiumOpsDashboard() {
                       {entry.action_taken === 'flagged_for_review' && (
                         <button 
                           onClick={() => approveLog(entry.tick_id)}
+                          aria-label={`Approve recommendation for tick #${entry.tick_id}`}
                           className="ml-3 text-xs bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded transition-colors"
                         >
                           Approve

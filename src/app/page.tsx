@@ -15,8 +15,10 @@ export default function StadiumOpsDashboard() {
   const [history, setHistory] = useState<LogEntry[]>([]);
   const [lang, setLang] = useState<'en' | 'hi' | 'mr'>('en');
   const [isProcessing, setIsProcessing] = useState(false);
-  
+
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const requestIdRef = useRef(0);
 
   const approveLog = async (tick_id: number) => {
     try {
@@ -25,9 +27,9 @@ export default function StadiumOpsDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tick_id })
       });
-      setHistory(prev => prev.map(log => 
-        (log.tick_id === tick_id && log.action_taken === 'flagged_for_review') 
-          ? { ...log, action_taken: 'approved_by_staff' } 
+      setHistory(prev => prev.map(log =>
+        (log.tick_id === tick_id && log.action_taken === 'flagged_for_review')
+          ? { ...log, action_taken: 'approved_by_staff' }
           : log
       ));
     } catch (err) {
@@ -36,6 +38,7 @@ export default function StadiumOpsDashboard() {
   };
 
   const fetchState = async (forceEvent = false, testInvalidLocation = false) => {
+    const requestId = ++requestIdRef.current;
     setIsProcessing(true);
     try {
       const res = await fetch('/api/loop', {
@@ -44,7 +47,10 @@ export default function StadiumOpsDashboard() {
         body: JSON.stringify({ forceEvent, testInvalidLocation })
       });
       const data = await res.json();
-      
+
+      // Ignore this response if a newer request has been sent since
+      if (requestId !== requestIdRef.current) return;
+
       setSignals(data.signals);
       setRecommendation(data.recommendation);
       setVerifyPassed(data.verifyPassed);
@@ -57,7 +63,7 @@ export default function StadiumOpsDashboard() {
     } catch (err) {
       console.error(err);
     } finally {
-      setIsProcessing(false);
+      if (requestId === requestIdRef.current) setIsProcessing(false);
     }
   };
 
@@ -67,7 +73,7 @@ export default function StadiumOpsDashboard() {
       const data = await res.json();
       setSignals(data.signals);
       setHistory(data.history || []);
-    } catch (err) {}
+    } catch (err) { }
   };
 
   useEffect(() => {
@@ -80,13 +86,13 @@ export default function StadiumOpsDashboard() {
       timerRef.current = setInterval(() => {
         fetchState();
       }, 20000);
-      
+
       // Fetch immediately on start
       fetchState();
     } else if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    
+
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
@@ -117,7 +123,7 @@ export default function StadiumOpsDashboard() {
   };
 
   const getCategoryIcon = (cat?: string) => {
-    switch(cat) {
+    switch (cat) {
       case 'crowd_management': return <Users size={20} />;
       case 'navigation': return <Navigation size={20} />;
       case 'accessibility': return <Accessibility size={20} />;
@@ -149,9 +155,9 @@ export default function StadiumOpsDashboard() {
           </div>
           <p className="text-sm text-gray-400 mt-1 md:ml-12">Autonomous Monitoring & Resolution Engine</p>
         </div>
-        
+
         <div className="flex flex-wrap gap-3 items-center mt-4 md:mt-0 justify-start md:justify-end">
-          <button 
+          <button
             onClick={resetDemoData}
             aria-label="Reset demo data"
             className="px-4 py-2.5 bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg font-medium transition-colors flex items-center gap-2 border border-gray-600 text-sm h-10"
@@ -160,7 +166,7 @@ export default function StadiumOpsDashboard() {
             Reset Demo Data
           </button>
 
-          <button 
+          <button
             onClick={triggerInvalidLocationTest}
             aria-label="Test: Invalid Location (injects an incident with an invalid location to test the Verify stage)"
             className="px-4 py-2.5 bg-purple-900/50 text-purple-400 hover:bg-purple-900 hover:text-white rounded-lg font-medium transition-colors flex items-center gap-2 border border-purple-500/50 text-sm h-10"
@@ -169,7 +175,7 @@ export default function StadiumOpsDashboard() {
             Test: Invalid Location
           </button>
 
-          <button 
+          <button
             onClick={triggerEvent}
             aria-label="Trigger a simulated crowd event"
             className="px-4 py-2.5 bg-[var(--color-warning-dim)] text-[var(--color-warning)] hover:bg-[var(--color-warning)] hover:text-white rounded-lg font-medium transition-colors flex items-center gap-2 border border-[var(--color-warning)] text-sm h-10"
@@ -177,8 +183,8 @@ export default function StadiumOpsDashboard() {
             <AlertTriangle size={18} aria-hidden="true" />
             Trigger Event
           </button>
-          
-          <button 
+
+          <button
             onClick={toggleLoop}
             aria-label={isRunning ? 'Stop the autonomous loop' : 'Start the autonomous loop'}
             aria-pressed={isRunning}
@@ -190,14 +196,14 @@ export default function StadiumOpsDashboard() {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Left Column: Live Signals */}
         <div className="lg:col-span-1 space-y-6">
           <div className="bg-[var(--color-card)] p-6 rounded-2xl border border-[var(--color-border)] shadow-lg flex flex-col h-full">
             <h2 className="text-xl font-bold mb-5 flex items-center gap-2">
               <Activity className="text-blue-400" /> Live Signals
             </h2>
-            
+
             {signals ? (
               <div className="space-y-6 flex-1">
                 <div>
@@ -255,7 +261,7 @@ export default function StadiumOpsDashboard() {
                 No signals data available
               </div>
             )}
-            
+
             {signals && (
               <div className="mt-6 pt-4 border-t border-gray-800 text-xs text-gray-500 flex justify-between">
                 <span>Last updated: {new Date(signals.timestamp).toLocaleTimeString()}</span>
@@ -272,14 +278,13 @@ export default function StadiumOpsDashboard() {
             aria-label="Action Hub recommendations"
             className="bg-[var(--color-card)] p-6 rounded-2xl border border-[var(--color-border)] shadow-lg min-h-[550px] flex flex-col relative overflow-hidden"
           >
-            
+
             {/* Background Gradient based on status */}
-            <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${
-              !recommendation ? 'from-gray-600 to-gray-400' :
-              recommendation.recommendation.toLowerCase() === 'no action needed' ? 'from-[var(--color-success)] to-emerald-400' :
-              !verifyPassed ? 'from-[var(--color-warning)] to-amber-400' :
-              'from-blue-500 to-cyan-400'
-            }`} />
+            <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${!recommendation ? 'from-gray-600 to-gray-400' :
+                recommendation.recommendation.toLowerCase() === 'no action needed' ? 'from-[var(--color-success)] to-emerald-400' :
+                  !verifyPassed ? 'from-[var(--color-warning)] to-amber-400' :
+                    'from-blue-500 to-cyan-400'
+              }`} />
 
             <h2 className="text-xl font-bold mb-5">Action Hub</h2>
 
@@ -295,17 +300,16 @@ export default function StadiumOpsDashboard() {
               </div>
             ) : (
               <div className="flex-1 flex flex-col gap-6">
-                
+
                 {/* Status Banner */}
-                <div className={`p-4 rounded-xl border-l-4 border-t border-r border-b flex items-start gap-4 shadow-sm ${
-                  !verifyPassed ? 'bg-[var(--color-warning-dim)] border-l-[var(--color-warning)] border-t-[var(--color-warning)]/20 border-r-[var(--color-warning)]/20 border-b-[var(--color-warning)]/20' :
-                  recommendation.recommendation.toLowerCase() === 'no action needed' ? 'bg-[var(--color-success-dim)] border-l-[var(--color-success)] border-t-[var(--color-success)]/20 border-r-[var(--color-success)]/20 border-b-[var(--color-success)]/20' :
-                  'bg-blue-500/10 border-l-blue-500 border-t-blue-500/20 border-r-blue-500/20 border-b-blue-500/20'
-                }`}>
+                <div className={`p-4 rounded-xl border-l-4 border-t border-r border-b flex items-start gap-4 shadow-sm ${!verifyPassed ? 'bg-[var(--color-warning-dim)] border-l-[var(--color-warning)] border-t-[var(--color-warning)]/20 border-r-[var(--color-warning)]/20 border-b-[var(--color-warning)]/20' :
+                    recommendation.recommendation.toLowerCase() === 'no action needed' ? 'bg-[var(--color-success-dim)] border-l-[var(--color-success)] border-t-[var(--color-success)]/20 border-r-[var(--color-success)]/20 border-b-[var(--color-success)]/20' :
+                      'bg-blue-500/10 border-l-blue-500 border-t-blue-500/20 border-r-blue-500/20 border-b-blue-500/20'
+                  }`}>
                   <div className="mt-1">
                     {!verifyPassed ? <AlertTriangle className="text-[var(--color-warning)]" /> :
-                     recommendation.recommendation.toLowerCase() === 'no action needed' ? <CheckCircle className="text-[var(--color-success)]" /> :
-                     <ShieldAlert className="text-blue-400" />}
+                      recommendation.recommendation.toLowerCase() === 'no action needed' ? <CheckCircle className="text-[var(--color-success)]" /> :
+                        <ShieldAlert className="text-blue-400" />}
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-start">
@@ -316,10 +320,10 @@ export default function StadiumOpsDashboard() {
                         Conf: {(recommendation.confidence * 100).toFixed(0)}%
                       </span>
                     </div>
-                    
+
                     {!verifyPassed && (
                       <div className="mt-3 p-3 bg-black/40 rounded-lg text-sm text-[var(--color-warning)] border border-[var(--color-warning)]/30">
-                        <p className="font-semibold mb-1 flex items-center gap-1"><XCircle size={14}/> HUMAN REVIEW REQUIRED</p>
+                        <p className="font-semibold mb-1 flex items-center gap-1"><XCircle size={14} /> HUMAN REVIEW REQUIRED</p>
                         <p>{verifyReason}</p>
                       </div>
                     )}
@@ -334,7 +338,7 @@ export default function StadiumOpsDashboard() {
                       {recommendation.reasoning}
                     </p>
                   </div>
-                  
+
                   {/* Details */}
                   <div className="space-y-4 bg-gray-800/30 p-4 rounded-xl border border-gray-700/50">
                     <div>
@@ -381,7 +385,7 @@ export default function StadiumOpsDashboard() {
                     </div>
                   </div>
                 )}
-                
+
               </div>
             )}
           </div>
@@ -393,7 +397,7 @@ export default function StadiumOpsDashboard() {
         <h2 className="text-xl font-bold mb-5 flex items-center gap-2">
           <Clock className="text-gray-400" /> Loop History
         </h2>
-        
+
         {history.length === 0 ? (
           <p className="text-gray-500 text-sm">No history recorded yet.</p>
         ) : (
@@ -417,7 +421,7 @@ export default function StadiumOpsDashboard() {
                       {entry.reasoning_output?.recommendation || "N/A"}
                     </td>
                     <td className="px-4 py-3 text-center align-middle">
-                      {entry.reasoning_output?.confidence !== undefined ? 
+                      {entry.reasoning_output?.confidence !== undefined ?
                         (entry.reasoning_output.confidence * 100).toFixed(0) + '%' : '-'}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-center align-middle">
@@ -425,7 +429,7 @@ export default function StadiumOpsDashboard() {
                         {entry.action_taken.replace(/_/g, ' ')}
                       </span>
                       {entry.action_taken === 'flagged_for_review' && (
-                        <button 
+                        <button
                           onClick={() => approveLog(entry.tick_id)}
                           aria-label={`Approve recommendation for tick #${entry.tick_id}`}
                           className="ml-3 text-xs bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded transition-colors"
@@ -441,7 +445,7 @@ export default function StadiumOpsDashboard() {
           </div>
         )}
       </div>
-      
+
     </div>
   );
 }
